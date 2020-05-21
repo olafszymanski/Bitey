@@ -4,5 +4,6 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///bitey.sqlite3'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+
 class DebugConfig(Config):
     DEBUG = True
