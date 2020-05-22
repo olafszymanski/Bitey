@@ -13,8 +13,10 @@ def create_app(config_class=DebugConfig):
     app.config.from_object(config_class)
 
     from .main.views import main
+    from .users.views import users
 
     app.register_blueprint(main)
+    app.register_blueprint(users)
 
     db.init_app(app)
     security.init_app(app)
