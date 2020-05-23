@@ -1,5 +1,8 @@
 flask
-flask_sqlalchemy
+flask-sqlalchemy
 mysqlclient
-flask_security
-email_validator
+flask-login
+flask-bcrypt
+bcrypt
+flask-wtf
+email-validator

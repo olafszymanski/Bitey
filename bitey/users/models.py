@@ -1,12 +1,11 @@
-from bitey import db
-from flask_security import UserMixin, RoleMixin
+from bitey import login_manager, db
+from flask_login import UserMixin
 from datetime import datetime
 
 
-roles_users = db.Table('roles_users',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('role_id', db.Integer, db.ForeignKey('role.id'))
-)
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
 
 
 class User(db.Model, UserMixin):
@@ -18,16 +17,17 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(200))
     active = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.now())
-    roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+
+
+    def __init__(self, name, last_name, username, email, password, active=False, created_at=datetime.now()):
+        self.name = name
+        self.last_name = last_name
+        self.username = username
+        self.email = email
+        self.password = password
+        self.active = active
+        self.created_at = created_at
+
 
     def __repr__(self):
         return f'User({self.id}, {self.username})'
-
-
-class Role(db.Model, RoleMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30), unique=True)
-    description = db.Column(db.String(100))
-
-    def __repr__(self):
-        return f'Role({self.id}, {self.name})'
