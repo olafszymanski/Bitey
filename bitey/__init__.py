@@ -2,12 +2,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
+from flask_mail import Mail
 from .config import DebugConfig
 
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 bcrypt = Bcrypt()
+mail = Mail()
 
 
 def create_app(config_class=DebugConfig):
@@ -25,5 +27,6 @@ def create_app(config_class=DebugConfig):
     login_manager.login_view = 'users.login'
     login_manager.login_message = 'You have to log in to access this page.'
     login_manager.login_message_category = 'info'
+    mail.init_app(app)
 
     return app

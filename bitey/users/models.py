@@ -15,18 +15,20 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(30), unique=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(200))
-    active = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    activated = db.Column(db.Boolean, default=False)
+    activated_on = db.Column(db.DateTime, default=None)
+    created_on = db.Column(db.DateTime, default=datetime.now())
 
 
-    def __init__(self, name, last_name, username, email, password, active=False, created_at=datetime.now()):
+    def __init__(self, name, last_name, username, email, password, activated=False, activated_on=None, created_on=datetime.now()):
         self.name = name
         self.last_name = last_name
         self.username = username
         self.email = email
         self.password = password
-        self.active = active
-        self.created_at = created_at
+        self.activated = activated
+        self.activated_on = activated_on
+        self.created_on = created_on
 
 
     def __repr__(self):
