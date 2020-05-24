@@ -1,10 +1,10 @@
 from bitey import db, bcrypt
-from flask import Blueprint, render_template, flash, redirect, url_for
-from flask_login import login_user, current_user, logout_user
+from flask import Blueprint, render_template, flash, redirect, url_for, request
+from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
 from .forms import SignUpForm, LogInForm
 from .models import User
-from .decorators import is_anonymous
+from .decorators import is_anonymous, is_activated
 from .utils import confirm_token, send_confirmation_email
 
 
@@ -53,10 +53,12 @@ def login():
 
         if user := User.query.filter_by(username=form.username_or_email.data).first():
             if validate_and_login(user):
-                return redirect(url_for('main.home'))
+                next_page = request.args.get('next')
+                return redirect(next_page) if next_page else redirect(url_for('main.home'))
         elif user := User.query.filter_by(email=form.username_or_email.data).first():
             if validate_and_login(user):
-                return redirect(url_for('main.home'))
+                next_page = request.args.get('next')
+                return redirect(next_page) if next_page else redirect(url_for('main.home'))
         else:
             flash('User not found! Please try different credentials.', 'danger')
 
@@ -90,3 +92,9 @@ def activation(token):
         flash('Token is invalid or has expired!', 'danger')
 
     return redirect(url_for('main.home'))
+
+
+@users.route('/profile')
+@login_required
+def profile():
+    return render_template('users/profile.html')

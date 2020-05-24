@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <h2>{{ current_user.username }}'s Profile</h2>
+            {% if current_user.full_name %}
+                <h5>{{ current_user.full_name }}</h5>
+                <p>{{ current_user.email }}</p>
+            {% endif %}
+            <hr>
+            <p>Address: {{ current_user.address }}</p>
+            <a class="btn btn-outline-dark" href="#">Edit</a>
+            <a class="btn btn-outline-dark" href="#">Change password</a>
+            <br>
+            <br>
+            {% if not current_user.activated %}
+                <a class="btn btn-primary" href="#">Resend activation e-mail</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
