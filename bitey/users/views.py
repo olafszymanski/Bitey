@@ -4,7 +4,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
 from .forms import SignUpForm, LogInForm, EditUserForm
 from .models import User
-from .decorators import is_anonymous, is_activated
+from .decorators import is_anonymous, is_activated, is_not_activated
 from .utils import confirm_token, send_activation_email
 
 
@@ -21,14 +21,15 @@ def signup():
 
         user = User(form.username.data, form.email.data, password, form.full_name.data, form.address.data)
 
-        send_activation_email(user, 'Activate Your Account', 'Thank you for signing up.')
+        if send_activation_email(user, 'Activate Your Account', 'Thank you for signing up.'):
+            flash('We have sent you an e-mail! Check your inbox to activate your account!', 'info')
+        else:
+            flash('Could not send an activation e-mail!', 'danger')
 
         db.session.add(user)
         db.session.commit()
 
         login_user(user)
-
-        flash('We have sent you an e-mail! Check your inbox to activate your account!', 'info')
 
         return redirect(url_for('main.home'))
 
@@ -123,9 +124,11 @@ def edit():
 
             db.session.commit()
 
-            send_activation_email(current_user, 'Reactivate Your Account', "We've noticed that you have changed your e-mail, you will now how to reactivate your account.")
+            if send_activation_email(current_user, 'Activate Your Account', "We've noticed that you have changed your e-mail, you will now how to reactivate your account."):
+                flash('We have sent you an e-mail! Check your inbox to reactivate your account!', 'success')
+            else:
+                flash('Could not send an activation e-mail!', 'danger')
 
-            flash('We have sent you an e-mail! Check your inbox to reactivate your account!', 'success')
         else:
             db.session.commit()
 
@@ -134,3 +137,16 @@ def edit():
         return redirect(url_for('users.profile'))
 
     return render_template('users/edit.html', title='Edit', form=form)
+
+
+@users.route('/profile/resend')
+@login_required
+@is_not_activated('users.profile')
+def resend():
+    # TODO: Add cooldown (?)
+    if send_activation_email(current_user, 'Activate Your Account', "We've noticed that you have changed your e-mail, you will now how to reactivate your account."):
+        flash('Reactivation e-mail sent!', 'success')
+    else:
+        flash('Could not send an activation e-mail!', 'danger')
+
+    return redirect(url_for('users.profile'))

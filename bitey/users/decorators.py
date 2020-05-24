@@ -31,3 +31,17 @@ def is_activated(redirect_url):
         return wrapper
 
     return is_activated_wrapper
+
+
+def is_not_activated(redirect_url):
+    def is_not_activated_wrapper(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if not current_user.activated:
+                return func(*args, **kwargs)
+            else:
+                return redirect(url_for(redirect_url))
+
+        return wrapper
+
+    return is_not_activated_wrapper

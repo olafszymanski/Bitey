@@ -28,12 +28,17 @@ def send_email(subject, to, content):
 
 
 def send_activation_email(user, title, body):
-    @copy_current_request_context
-    def send():
-        token = generate_confirmation_token(user)
-        url = url_for('users.activation', token=token, _external=True)
-        content = render_template('users/emails/activation.html', username=user.username, body=body, url=url)
-        send_email(title, user.email, content)
+    try:
+        @copy_current_request_context
+        def send():
+            token = generate_confirmation_token(user)
+            url = url_for('users.activation', token=token, _external=True)
+            content = render_template('users/emails/activation.html', username=user.username, body=body, url=url)
+            send_email(title, user.email, content)
 
-    sender = Thread(name='email_sender', target=send)
-    sender.start()
+        sender = Thread(name='email_sender', target=send)
+        sender.start()
+
+        return True
+    except:
+        return False
