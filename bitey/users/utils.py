@@ -27,13 +27,13 @@ def send_email(subject, to, content):
     mail.send(message)
 
 
-def send_confirmation_email(user):
+def send_activation_email(user, title, body):
     @copy_current_request_context
     def send():
         token = generate_confirmation_token(user)
         url = url_for('users.activation', token=token, _external=True)
-        content = render_template('users/emails/account_activation.html', username=user.username, url=url)
-        send_email('Activate Your Account', user.email, content)
+        content = render_template('users/emails/activation.html', username=user.username, body=body, url=url)
+        send_email(title, user.email, content)
 
     sender = Thread(name='email_sender', target=send)
     sender.start()

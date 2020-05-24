@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import redirect, url_for
+from flask import redirect, url_for, flash
 from flask_login import current_user
 
 
@@ -24,6 +24,8 @@ def is_activated(redirect_url):
             if current_user.activated:
                 return func(*args, **kwargs)
             else:
+                flash('You have to activate your account to access this page.', 'info')
+
                 return redirect(url_for(redirect_url))
 
         return wrapper

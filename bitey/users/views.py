@@ -2,10 +2,10 @@ from bitey import db, bcrypt
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
-from .forms import SignUpForm, LogInForm
+from .forms import SignUpForm, LogInForm, EditUserForm
 from .models import User
 from .decorators import is_anonymous, is_activated
-from .utils import confirm_token, send_confirmation_email
+from .utils import confirm_token, send_activation_email
 
 
 users = Blueprint('users', __name__)
@@ -21,14 +21,14 @@ def signup():
 
         user = User(form.username.data, form.email.data, password, form.full_name.data, form.address.data)
 
-        send_confirmation_email(user)
+        send_activation_email(user, 'Activate Your Account', 'Thank you for signing up.')
 
         db.session.add(user)
         db.session.commit()
 
         login_user(user)
 
-        flash('We have sent you a confirmation e-mail, check your inbox and activate your account!', 'info')
+        flash('We have sent you an e-mail! Check your inbox to activate your account!', 'info')
 
         return redirect(url_for('main.home'))
 
@@ -97,4 +97,40 @@ def activation(token):
 @users.route('/profile')
 @login_required
 def profile():
-    return render_template('users/profile.html')
+    return render_template('users/profile.html', title='Profile')
+
+
+@users.route('/profile/edit', methods=('GET', 'POST'))
+@login_required
+@is_activated('users.profile')
+def edit():
+    form = EditUserForm()
+
+    if request.method == 'GET':
+        form.full_name.data = current_user.full_name
+        form.address.data = current_user.address
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+
+    if form.validate_on_submit():
+        current_user.full_name = form.full_name.data
+        current_user.address = form.address.data
+        if form.username.data:
+            current_user.username = form.username.data
+        if form.email.data != current_user.email:
+            current_user.email = form.email.data
+            current_user.activated = False
+
+            db.session.commit()
+
+            send_activation_email(current_user, 'Reactivate Your Account', "We've noticed that you have changed your e-mail, you will now how to reactivate your account.")
+
+            flash('We have sent you an e-mail! Check your inbox to reactivate your account!', 'success')
+        else:
+            db.session.commit()
+
+            flash('Profile edited successfully!', 'success')
+
+        return redirect(url_for('users.profile'))
+
+    return render_template('users/edit.html', title='Edit', form=form)
