@@ -20,7 +20,8 @@ class User(db.Model, UserMixin):
     created_on = db.Column(db.DateTime, default=datetime.now())
 
 
-    def __init__(self, username, email, password, full_name=None, address=None, activated=False, activated_on=None, created_on=datetime.now()):
+    def __init__(self, username, email, password, full_name=None, address=None, activated=False, activated_on=None,
+                 created_on=datetime.now()):
         self.username = username
         self.email = email
         self.password = password

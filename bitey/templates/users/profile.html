@@ -11,7 +11,7 @@
             <p>Address: {{ current_user.address }}</p>
             {% if current_user.activated %}
                 <a class="btn btn-outline-dark" href="{{ url_for('users.edit') }}">Edit</a>
-                <a class="btn btn-outline-dark" href="#">Change password</a>
+                <a class="btn btn-outline-dark" href="{{ url_for('users.password_change_request') }}">Change password</a>
             {% else %}
                 <a class="btn btn-outline-primary" href="{{ url_for('users.resend') }}">Resend activation e-mail</a>
             {% endif %}

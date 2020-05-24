@@ -2,10 +2,10 @@ from bitey import db, bcrypt
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
-from .forms import SignUpForm, LogInForm, EditUserForm
+from .forms import SignUpForm, LogInForm, EditUserForm, ChangePasswordForm
 from .models import User
 from .decorators import is_anonymous, is_activated, is_not_activated
-from .utils import confirm_token, send_activation_email
+from .utils import validate_token, send_activation_email, send_password_change_request_email
 
 
 users = Blueprint('users', __name__)
@@ -21,8 +21,9 @@ def signup():
 
         user = User(form.username.data, form.email.data, password, form.full_name.data, form.address.data)
 
-        if send_activation_email(user, 'Activate Your Account', 'Thank you for signing up.'):
-            flash('We have sent you an e-mail! Check your inbox to activate your account!', 'info')
+        if send_activation_email(user, 'Activate Your Account', 'Thank you for signing up. Please follow link below to '
+                                                                'activate your account:'):
+            flash('We have sent you an e-mail! Check inbox to activate your account!', 'info')
         else:
             flash('Could not send an activation e-mail!', 'danger')
 
@@ -76,7 +77,7 @@ def logout():
 
 @users.route('/activation/<token>')
 def activation(token):
-    if email := confirm_token(token):
+    if email := validate_token(token):
         if user := User.query.filter_by(email=email).first():
             if user.activated:
                 flash('Your account is already activated.', 'info')
@@ -88,7 +89,7 @@ def activation(token):
 
                 flash('Your account has been activated! Thank you!', 'success')
         else:
-            flash("User not found!", 'danger')
+            flash('User not found!', 'danger')
     else:
         flash('Token is invalid or has expired!', 'danger')
 
@@ -124,7 +125,10 @@ def edit():
 
             db.session.commit()
 
-            if send_activation_email(current_user, 'Activate Your Account', "We've noticed that you have changed your e-mail, you will now how to reactivate your account."):
+            if send_activation_email(current_user, 'Activate Your Account', "We've noticed that you have changed your "
+                                                                            "e-mail, you will now how to reactivate your "
+                                                                            "account. Please follow link below to "
+                                                                            "activate your account:"):
                 flash('We have sent you an e-mail! Check your inbox to reactivate your account!', 'success')
             else:
                 flash('Could not send an activation e-mail!', 'danger')
@@ -139,12 +143,49 @@ def edit():
     return render_template('users/edit.html', title='Edit', form=form)
 
 
+@users.route('/password/change/request')
+@login_required
+@is_activated('users.profile')
+def password_change_request():
+    if send_password_change_request_email(current_user):
+        flash('We have sent you an e-mail! Check inbox to change your password!', 'success')
+    else:
+        flash('Could not request password change!', 'danger')
+
+    return redirect(url_for('users.profile'))
+
+
+@users.route('/password/change/<token>', methods=('GET', 'POST'))
+@login_required
+@is_activated('users.profile')
+def password_change(token):
+    if current_user.email == validate_token(token):
+        form = ChangePasswordForm()
+
+        if form.validate_on_submit():
+            current_user.password = bcrypt.generate_password_hash(form.password.data)
+
+            db.session.commit()
+
+            flash('Your password has been changed!', 'success')
+
+            return redirect(url_for('users.profile'))
+
+        return render_template('users/password-change.html', title='Change password', form=form)
+    else:
+        flash('Token is invalid or has expired!', 'danger')
+
+    return redirect(url_for('users.profile'))
+
+
 @users.route('/profile/resend')
 @login_required
 @is_not_activated('users.profile')
 def resend():
     # TODO: Add cooldown (?)
-    if send_activation_email(current_user, 'Activate Your Account', "We've noticed that you have changed your e-mail, you will now how to reactivate your account."):
+    if send_activation_email(current_user, 'Activate Your Account', "We've noticed that you have changed your e-mail, "
+                                                                    "you will now how to reactivate your account. Please "
+                                                                    "follow link below to activate your account:"):
         flash('Reactivation e-mail sent!', 'success')
     else:
         flash('Could not send an activation e-mail!', 'danger')

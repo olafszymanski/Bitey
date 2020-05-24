@@ -55,3 +55,9 @@ class EditUserForm(FlaskForm):
     def validate_password(self, field):
         if not bcrypt.check_password_hash(current_user.password, field.data):
             raise ValidationError('The password is incorrect!')
+
+
+class ChangePasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=200)])
+    repeat_password = PasswordField('Repeat password', validators=[EqualTo('password')])
+    submit = SubmitField('Confirm')
