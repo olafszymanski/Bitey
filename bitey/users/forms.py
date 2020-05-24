@@ -18,12 +18,12 @@ class SignUpForm(FlaskForm):
 
     def validate_username(self, field):
         if User.query.filter_by(username=field.data).first():
-            raise ValidationError('This username is already taken! Please try a different one.')
+            raise ValidationError('This username is already taken! Please try using a different one.')
 
 
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
-            raise ValidationError('This e-mail is already taken! Please try a different one.')
+            raise ValidationError('This e-mail is already taken! Please try using a different one.')
 
 
 class LogInForm(FlaskForm):
@@ -44,12 +44,12 @@ class EditUserForm(FlaskForm):
 
     def validate_username(self, field):
         if current_user.username != field.data and User.query.filter_by(username=field.data).first():
-            raise ValidationError('This username is already taken! Please try a different one.')
+            raise ValidationError('This username is already taken! Please try using a different one.')
 
 
     def validate_email(self, field):
         if current_user.email != field.data and User.query.filter_by(email=field.data).first():
-            raise ValidationError('This e-mail is already taken! Please try a different one.')
+            raise ValidationError('This e-mail is already taken! Please try using a different one.')
 
 
     def validate_password(self, field):
@@ -61,3 +61,13 @@ class ChangePasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=200)])
     repeat_password = PasswordField('Repeat Password', validators=[EqualTo('password')])
     submit = SubmitField('Confirm')
+
+
+class ResetPasswordForm(FlaskForm):
+    email = StringField('E-mail', validators=[DataRequired(), Email(), Length(max=100)])
+    submit = SubmitField('Reset')
+
+
+    def validate_email(self, field):
+        if not User.query.filter_by(email=field.data).first():
+            raise ValidationError('Could not find a user with this e-mail! Please try using a different one.')
