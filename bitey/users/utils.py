@@ -1,7 +1,8 @@
 from bitey import mail
-from flask import current_app
+from flask import current_app, copy_current_request_context
 from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer
+from threading import Thread
 
 
 def generate_confirmation_token(user):
@@ -23,4 +24,10 @@ def confirm_token(token, expiration=3600):
 
 def send_email(subject, to, content):
     message = Message(subject, [to], html=content)
-    mail.send(message)
+
+    @copy_current_request_context
+    def send(msg):
+        mail.send(msg)
+
+    sender = Thread(name='email_sender', target=send, args=(message,))
+    sender.start()

@@ -23,7 +23,7 @@ def signup():
 
         token = generate_confirmation_token(user)
         url = url_for('users.activation', token=token, _external=True)
-        content = render_template('users/emails/account_activation.html', name=(user.name if user.name else user.username), url=url)
+        content = render_template('users/emails/account_activation.html', username=user.username, url=url)
         send_email('Activate Your Account', user.email, content)
 
         db.session.add(user)
