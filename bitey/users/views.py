@@ -19,7 +19,7 @@ def signup():
     if form.validate_on_submit():
         password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
-        user = User(form.name.data, form.last_name.data, form.username.data, form.email.data, password)
+        user = User(form.username.data, form.email.data, password, form.name.data, form.last_name.data, form.address.data)
 
         token = generate_confirmation_token(user)
         url = url_for('users.activation', token=token, _external=True)
@@ -76,20 +76,20 @@ def logout():
 
 @users.route('/activation/<token>')
 def activation(token):
-    try:
-        email = confirm_token(token)
-    except:
-        flash('Token is invalid or has expired!', 'danger')
+    if email := confirm_token(token):
+        if user := User.query.filter_by(email=email).first():
+            if user.activated:
+                flash('Your account is already activated.', 'info')
+            else:
+                user.activated = True
+                user.activated_on = datetime.now()
 
-    user = User.query.filter_by(email=email).first()
-    if user.activated:
-        flash('Your account is already activated.', 'info')
+                db.session.commit()
+
+                flash('Your account has been activated! Thank you!', 'success')
+        else:
+            flash("User not found!", 'danger')
     else:
-        user.activated = True
-        user.activated_on = datetime.now()
-
-        db.session.commit()
-
-        flash('Your account has been activated! Thank you!', 'success')
+        flash('Token is invalid or has expired!', 'danger')
 
     return redirect(url_for('main.home'))
