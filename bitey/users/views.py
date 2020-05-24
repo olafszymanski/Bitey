@@ -5,7 +5,7 @@ from datetime import datetime
 from .forms import SignUpForm, LogInForm
 from .models import User
 from .decorators import is_anonymous
-from .utils import generate_confirmation_token, confirm_token, send_email
+from .utils import confirm_token, send_confirmation_email
 
 
 users = Blueprint('users', __name__)
@@ -21,10 +21,7 @@ def signup():
 
         user = User(form.username.data, form.email.data, password, form.full_name.data, form.address.data)
 
-        token = generate_confirmation_token(user)
-        url = url_for('users.activation', token=token, _external=True)
-        content = render_template('users/emails/account_activation.html', username=user.username, url=url)
-        send_email('Activate Your Account', user.email, content)
+        send_confirmation_email(user)
 
         db.session.add(user)
         db.session.commit()

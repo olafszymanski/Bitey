@@ -1,5 +1,5 @@
 from bitey import mail
-from flask import current_app, copy_current_request_context
+from flask import current_app, copy_current_request_context, url_for, render_template
 from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer
 from threading import Thread
@@ -24,10 +24,16 @@ def confirm_token(token, expiration=3600):
 
 def send_email(subject, to, content):
     message = Message(subject, [to], html=content)
+    mail.send(message)
 
+
+def send_confirmation_email(user):
     @copy_current_request_context
-    def send(msg):
-        mail.send(msg)
+    def send():
+        token = generate_confirmation_token(user)
+        url = url_for('users.activation', token=token, _external=True)
+        content = render_template('users/emails/account_activation.html', username=user.username, url=url)
+        send_email('Activate Your Account', user.email, content)
 
-    sender = Thread(name='email_sender', target=send, args=(message,))
+    sender = Thread(name='email_sender', target=send)
     sender.start()
