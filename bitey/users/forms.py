@@ -5,8 +5,7 @@ from .models import User
 
 
 class SignUpForm(FlaskForm):
-    name = StringField('Name', validators=[Optional(), Length(max=30)])
-    last_name = StringField('Last name', validators=[Optional(), Length(max=30)])
+    full_name = StringField('Full name', validators=[Optional(), Length(max=100)])
     address = TextAreaField('Address', validators=[Optional(), Length(max=100)])
     username = StringField('Username', validators=[DataRequired(), Length(min=5, max=30)])
     email = StringField('E-mail', validators=[DataRequired(), Email(), Length(max=100)])

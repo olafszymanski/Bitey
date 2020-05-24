@@ -19,7 +19,7 @@ def signup():
     if form.validate_on_submit():
         password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
-        user = User(form.username.data, form.email.data, password, form.name.data, form.last_name.data, form.address.data)
+        user = User(form.username.data, form.email.data, password, form.full_name.data, form.address.data)
 
         token = generate_confirmation_token(user)
         url = url_for('users.activation', token=token, _external=True)
