@@ -19,7 +19,9 @@ def signup():
     if form.validate_on_submit():
         password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
-        user = User(form.username.data, form.email.data, password, form.full_name.data, form.address.data)
+        user = User(form.username.data, form.email.data, password, form.full_name.data if form.full_name.data.strip() else None,
+                    form.address.data if form.address.data.strip() else None)
+
 
         if send_activation_email(user, 'Activate Your Account', 'Thank you for signing up. Please follow link below to '
                                                                 'activate your account:'):
@@ -49,7 +51,7 @@ def login():
 
                 return True
             else:
-                flash('The password is incorrect!', 'danger')
+                flash('The password you entered is incorrect!', 'danger')
 
                 return False
 
@@ -131,10 +133,9 @@ def edit():
         form.email.data = current_user.email
 
     if form.validate_on_submit():
-        current_user.full_name = form.full_name.data
-        current_user.address = form.address.data
-        if form.username.data:
-            current_user.username = form.username.data
+        current_user.full_name = form.full_name.data if form.full_name.data.strip() else None
+        current_user.address = form.address.data if form.address.data.strip() else None
+        current_user.username = form.username.data
         if form.email.data != current_user.email:
             current_user.email = form.email.data
             current_user.activated = False
@@ -152,7 +153,7 @@ def edit():
         else:
             db.session.commit()
 
-            flash('Profile edited successfully!', 'success')
+            flash('Your profile has been edited successfully!', 'success')
 
         return redirect(url_for('users.profile'))
 

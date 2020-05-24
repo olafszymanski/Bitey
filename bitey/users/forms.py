@@ -8,7 +8,7 @@ from .models import User
 
 class SignUpForm(FlaskForm):
     full_name = StringField('Full Name', validators=[Optional(), Length(min=2, max=100)])
-    address = TextAreaField('Address', validators=[Optional(), Length(max=100)])
+    address = TextAreaField('Address', validators=[Optional(), Length(min=8, max=100)])
     username = StringField('Username', validators=[DataRequired(), Length(min=5, max=30)])
     email = StringField('E-mail', validators=[DataRequired(), Email(), Length(max=100)])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=200)])
@@ -34,10 +34,10 @@ class LogInForm(FlaskForm):
 
 
 class EditUserForm(FlaskForm):
-    full_name = StringField('Full Name', validators=[Optional(), Length(max=100)])
-    address = TextAreaField('Address', validators=[Optional(), Length(max=100)])
-    username = StringField('Username', validators=[Optional(), Length(min=5, max=30)])
-    email = StringField('E-mail', validators=[Optional(), Email(), Length(max=100)])
+    full_name = StringField('Full Name', validators=[Optional(), Length(min=2, max=100)])
+    address = TextAreaField('Address', validators=[Optional(), Length(min=8, max=100)])
+    username = StringField('Username', validators=[DataRequired(), Length(min=5, max=30)])
+    email = StringField('E-mail', validators=[DataRequired(), Email(), Length(max=100)])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Save')
 
