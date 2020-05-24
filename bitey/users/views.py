@@ -90,7 +90,7 @@ def reset_password():
         else:
             flash('Could not send a reset password e-mail!', 'danger')
 
-    return render_template('users/reset-password.html', title='Reset Password', form=form)
+    return render_template('users/password-reset.html', title='Reset Password', form=form)
 
 
 @users.route('/activation/<token>')
