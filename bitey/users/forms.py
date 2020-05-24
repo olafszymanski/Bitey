@@ -7,13 +7,13 @@ from .models import User
 
 
 class SignUpForm(FlaskForm):
-    full_name = StringField('Full name', validators=[Optional(), Length(min=2, max=100)])
+    full_name = StringField('Full Name', validators=[Optional(), Length(min=2, max=100)])
     address = TextAreaField('Address', validators=[Optional(), Length(max=100)])
     username = StringField('Username', validators=[DataRequired(), Length(min=5, max=30)])
     email = StringField('E-mail', validators=[DataRequired(), Email(), Length(max=100)])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=200)])
-    repeat_password = PasswordField('Repeat password', validators=[EqualTo('password')])
-    submit = SubmitField('Sign up')
+    repeat_password = PasswordField('Repeat Password', validators=[EqualTo('password')])
+    submit = SubmitField('Sign Up')
 
 
     def validate_username(self, field):
@@ -27,14 +27,14 @@ class SignUpForm(FlaskForm):
 
 
 class LogInForm(FlaskForm):
-    username_or_email = StringField('Username or e-mail', validators=[DataRequired()])
+    username_or_email = StringField('Username or E-mail', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember me')
-    submit = SubmitField('Log in')
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Log In')
 
 
 class EditUserForm(FlaskForm):
-    full_name = StringField('Full name', validators=[Optional(), Length(max=100)])
+    full_name = StringField('Full Name', validators=[Optional(), Length(max=100)])
     address = TextAreaField('Address', validators=[Optional(), Length(max=100)])
     username = StringField('Username', validators=[Optional(), Length(min=5, max=30)])
     email = StringField('E-mail', validators=[Optional(), Email(), Length(max=100)])
@@ -59,5 +59,5 @@ class EditUserForm(FlaskForm):
 
 class ChangePasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=200)])
-    repeat_password = PasswordField('Repeat password', validators=[EqualTo('password')])
+    repeat_password = PasswordField('Repeat Password', validators=[EqualTo('password')])
     submit = SubmitField('Confirm')

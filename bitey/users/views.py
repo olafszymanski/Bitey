@@ -143,7 +143,7 @@ def edit():
     return render_template('users/edit.html', title='Edit', form=form)
 
 
-@users.route('/password/change/request')
+@users.route('/profile/password/change/request')
 @login_required
 @is_activated('users.profile')
 def password_change_request():
@@ -155,7 +155,7 @@ def password_change_request():
     return redirect(url_for('users.profile'))
 
 
-@users.route('/password/change/<token>', methods=('GET', 'POST'))
+@users.route('/profile/password/change/<token>', methods=('GET', 'POST'))
 @login_required
 @is_activated('users.profile')
 def password_change(token):
