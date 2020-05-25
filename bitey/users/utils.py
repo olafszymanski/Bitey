@@ -3,6 +3,7 @@ from flask import current_app, copy_current_request_context, url_for, render_tem
 from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer
 from threading import Thread
+import pycountry
 
 
 def generate_token(user):
@@ -58,3 +59,16 @@ def send_password_change_request_email(user):
         return True
     except:
         return False
+
+
+def parse_countries():
+    countries = []
+
+    for country in pycountry.countries:
+        countries.append((country.name, country.name))
+
+    return countries
+
+
+def remove_whitespaces(string):
+    return ' '.join(string.split())

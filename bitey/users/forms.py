@@ -1,19 +1,27 @@
 from bitey import bcrypt
 from flask_wtf import FlaskForm
 from flask_login import current_user
-from wtforms import StringField, TextAreaField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, SelectField, TextAreaField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import Optional, Length, DataRequired, Email, EqualTo, ValidationError
 from .models import User
+from .utils import parse_countries
 
 
 class SignUpForm(FlaskForm):
     full_name = StringField('Full Name', validators=[Optional(), Length(min=2, max=100)])
-    address = TextAreaField('Address', validators=[Optional(), Length(min=8, max=100)])
+    country = SelectField('Country', validators=[DataRequired()], choices=parse_countries(), validate_choice=False)
+    city = StringField('City', validators=[DataRequired(), Length(min=2, max=100)])
+    address = TextAreaField('Address', validators=[DataRequired(), Length(min=8, max=100)])
     username = StringField('Username', validators=[DataRequired(), Length(min=5, max=30)])
     email = StringField('E-mail', validators=[DataRequired(), Email(), Length(max=100)])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=200)])
     repeat_password = PasswordField('Repeat Password', validators=[EqualTo('password')])
     submit = SubmitField('Sign Up')
+
+
+    def validate_country(self, field):
+        if (field.data, field.data) not in parse_countries():
+            raise ValidationError('Country does not exist!')
 
 
     def validate_username(self, field):
@@ -35,11 +43,18 @@ class LogInForm(FlaskForm):
 
 class EditUserForm(FlaskForm):
     full_name = StringField('Full Name', validators=[Optional(), Length(min=2, max=100)])
-    address = TextAreaField('Address', validators=[Optional(), Length(min=8, max=100)])
+    country = SelectField('Country', validators=[DataRequired()], choices=parse_countries(), validate_choice=False)
+    city = StringField('City', validators=[DataRequired(), Length(min=2, max=100)])
+    address = TextAreaField('Address', validators=[DataRequired(), Length(min=8, max=100)])
     username = StringField('Username', validators=[DataRequired(), Length(min=5, max=30)])
     email = StringField('E-mail', validators=[DataRequired(), Email(), Length(max=100)])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Save')
+
+
+    def validate_country(self, field):
+        if (field.data, field.data) not in parse_countries():
+            raise ValidationError('Country does not exist!')
 
 
     def validate_username(self, field):

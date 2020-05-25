@@ -5,7 +5,7 @@ from datetime import datetime
 from .forms import SignUpForm, LogInForm, EditUserForm, ChangePasswordForm, ResetPasswordForm
 from .models import User
 from .decorators import is_anonymous, is_activated, is_not_activated
-from .utils import validate_token, send_activation_email, send_password_change_request_email
+from .utils import validate_token, send_activation_email, send_password_change_request_email, remove_whitespaces
 
 
 users = Blueprint('users', __name__)
@@ -19,8 +19,9 @@ def signup():
     if form.validate_on_submit():
         password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
-        user = User(form.username.data, form.email.data, password, form.full_name.data if form.full_name.data.strip() else None,
-                    form.address.data if form.address.data.strip() else None)
+        user = User(remove_whitespaces(form.username.data), remove_whitespaces(form.email.data), password,
+                    remove_whitespaces(form.country.data), remove_whitespaces(form.city.data),
+                    remove_whitespaces(form.address.data), remove_whitespaces(form.full_name.data))
 
 
         if send_activation_email(user, 'Activate Your Account', 'Thank you for signing up. Please follow link below to '
@@ -79,7 +80,7 @@ def logout():
 
 @users.route('/password/reset', methods=('GET', 'POST'))
 @is_anonymous('main.home')
-def reset_password():
+def password_reset():
     form = ResetPasswordForm()
 
     if form.validate_on_submit():
@@ -128,16 +129,20 @@ def edit():
 
     if request.method == 'GET':
         form.full_name.data = current_user.full_name
+        form.country.data = current_user.country
+        form.city.data = current_user.city
         form.address.data = current_user.address
         form.username.data = current_user.username
         form.email.data = current_user.email
 
     if form.validate_on_submit():
-        current_user.full_name = form.full_name.data if form.full_name.data.strip() else None
-        current_user.address = form.address.data if form.address.data.strip() else None
-        current_user.username = form.username.data
+        current_user.full_name = remove_whitespaces(form.full_name.data)
+        current_user.country = remove_whitespaces(form.country.data)
+        current_user.city = remove_whitespaces(form.city.data)
+        current_user.address = remove_whitespaces(form.address.data)
+        current_user.username = remove_whitespaces(form.username.data)
         if form.email.data != current_user.email:
-            current_user.email = form.email.data
+            current_user.email = remove_whitespaces(form.email.data.split())
             current_user.activated = False
 
             db.session.commit()

@@ -14,18 +14,22 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(200))
     full_name = db.Column(db.String(100), nullable=True)
-    address = db.Column(db.String(100), nullable=True)
+    country = db.Column(db.String(60))
+    city = db.Column(db.String(100))
+    address = db.Column(db.String(100))
     activated = db.Column(db.Boolean, default=False)
     activated_on = db.Column(db.DateTime, default=None)
     created_on = db.Column(db.DateTime, default=datetime.now())
 
 
-    def __init__(self, username, email, password, full_name=None, address=None, activated=False, activated_on=None,
-                 created_on=datetime.now()):
+    def __init__(self, username, email, password, country, city, address, full_name=None, activated=False,
+                 activated_on=None, created_on=datetime.now()):
         self.username = username
         self.email = email
         self.password = password
         self.full_name = full_name
+        self.country = country
+        self.city = city
         self.address = address
         self.activated = activated
         self.activated_on = activated_on

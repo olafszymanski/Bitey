@@ -8,9 +8,9 @@
             {% endif %}
             <hr>
             <p><b>E-mail:</b> {{ current_user.email }}</p>
-            {% if current_user.address %}
-                <p><b>Address:</b> {{ current_user.address }}</p>
-            {% endif %}
+            <p><b>Country:</b> {{ current_user.country }}</p>
+            <p><b>City:</b> {{ current_user.city }}</p>
+            <p><b>Address:</b> {{ current_user.address }}</p>
             {% if current_user.activated %}
                 <a class="btn btn-outline-dark" href="{{ url_for('users.edit') }}">Edit</a>
                 <a class="btn btn-outline-dark" href="{{ url_for('users.password_change_request') }}">Change Password</a>

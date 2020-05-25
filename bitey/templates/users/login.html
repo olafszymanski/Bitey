@@ -28,7 +28,7 @@
             {% else %}
                 {{ form.password(class="form-control form-control-lg") }}
             {% endif %}
-            <a href="{{ url_for('users.reset_password') }}"><small>Forgot Password?</small></a>
+            <a href="{{ url_for('users.password_reset') }}"><small>Forgot Password?</small></a>
         </div>
         <div class="form-group">
             {{ form.remember_me }}
