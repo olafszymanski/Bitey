@@ -17,6 +17,7 @@
             {% else %}
                 <a class="btn btn-outline-primary" href="{{ url_for('users.resend') }}">Resend Activation E-mail</a>
             {% endif %}
+            <a class="btn btn-outline-danger" href="{{ url_for('users.delete') }}">Delete</a>
         </div>
     </div>
 {% endblock %}

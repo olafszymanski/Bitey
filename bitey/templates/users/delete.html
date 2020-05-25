@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Delete Account</h2>
+    <p>Your account will be permanently deleted. This process is not reversible, are you sure you want to continue?</p>
+    <form action="" method="post">
+        <a class="btn btn-dark" href="{{ url_for('users.profile') }}">No</a>
+        <button type="submit" class="btn btn-outline-danger">Yes</button>
+    </form>
+{% endblock %}

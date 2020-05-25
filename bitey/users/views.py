@@ -142,7 +142,7 @@ def edit():
         current_user.address = remove_whitespaces(form.address.data)
         current_user.username = remove_whitespaces(form.username.data)
         if form.email.data != current_user.email:
-            current_user.email = remove_whitespaces(form.email.data.split())
+            current_user.email = remove_whitespaces(form.email.data)
             current_user.activated = False
 
             db.session.commit()
@@ -214,3 +214,17 @@ def resend():
         flash('Could not send an activation e-mail!', 'danger')
 
     return redirect(url_for('users.profile'))
+
+
+@users.route('/profile/delete', methods=('GET', 'POST'))
+@login_required
+def delete():
+    if request.method == 'POST':
+        db.session.delete(current_user)
+        db.session.commit()
+
+        flash('Your account has been successfully deleted.', 'success')
+
+        return redirect(url_for('main.home'))
+
+    return render_template('users/delete.html', title='Delete Account')
